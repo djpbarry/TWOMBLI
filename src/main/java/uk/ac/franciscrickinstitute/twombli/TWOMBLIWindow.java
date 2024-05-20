@@ -127,7 +127,7 @@ public class TWOMBLIWindow extends StackWindow {
         // Minimum curvature
         JLabel minimumCurvatureWindowInfo = new JLabel("Minimum Anamorf Curvature Window:");
         this.minimumCurvatureWindowField = new JFormattedTextField(intFormat);
-        this.minimumCurvatureWindowField.setValue(40);
+        this.minimumCurvatureWindowField.setValue(20);
         JPanel minimumCurvatureWindowPanel = new JPanel();
         minimumCurvatureWindowPanel.setLayout(panelLayout);
         minimumCurvatureWindowPanel.setToolTipText("The minimum curvature window for Anamorf.");
@@ -137,7 +137,7 @@ public class TWOMBLIWindow extends StackWindow {
         // Maximum curvature
         JLabel maximumCurvatureWindowInfo = new JLabel("Maximum Anamorf Curvature Window:");
         this.maximumCurvatureWindowField = new JFormattedTextField(intFormat);
-        this.maximumCurvatureWindowField.setValue(20);
+        this.maximumCurvatureWindowField.setValue(40);
         JPanel maximumCurvatureWindowPanel = new JPanel();
         maximumCurvatureWindowPanel.setLayout(panelLayout);
         maximumCurvatureWindowPanel.setToolTipText("The minimum curvature window for Anamorf.");
@@ -534,8 +534,15 @@ public class TWOMBLIWindow extends StackWindow {
         inputs.put("maximumLineWidth", Integer.valueOf(this.maximumLineWidthField.getText()));
         inputs.put("darkLines", this.darklinesCheckbox.isSelected());
         inputs.put("minimumBranchLength", Integer.valueOf(this.minimumBranchLengthField.getText()));
-        inputs.put("minimumCurvatureWindow", Integer.valueOf(this.minimumCurvatureWindowField.getText()));
-        inputs.put("maximumCurvatureWindow", Integer.valueOf(this.maximumCurvatureWindowField.getText()));
+
+        Integer minValue = Integer.valueOf(this.minimumCurvatureWindowField.getText());
+        Integer maxValue = Integer.valueOf(this.maximumCurvatureWindowField.getText());
+        if (maxValue < minValue) {
+            maxValue = minValue;
+        }
+        inputs.put("minimumCurvatureWindow", minValue);
+        inputs.put("maximumCurvatureWindow", maxValue);
+
         inputs.put("curvatureWindowStepSize", Integer.valueOf(this.curvatureStepSizeField.getText()));
         inputs.put("maximumDisplayHDM", Integer.valueOf(this.maximumDisplayHDMField.getText()));
         inputs.put("contrastSaturation", Float.valueOf(this.contrastSaturationField.getText()));
