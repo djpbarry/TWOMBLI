@@ -12,6 +12,7 @@ import ij.ImagePlus;
 import ij.WindowManager;
 import ij.gui.Roi;
 import ij.io.FileInfo;
+import ij.measure.Measurements;
 import ij.measure.ResultsTable;
 import ij.plugin.ImageCalculator;
 import ij.plugin.Macro_Runner;
@@ -415,11 +416,11 @@ public class TWOMBLIRunner implements Command {
         WindowManager.setTempCurrentImage(null);
 
         // Perform our measurements
-        WindowManager.setTempCurrentImage(maskImage);
-        Analyzer.setMeasurement(Analyzer.AREA, true);
-        roiManager.runCommand("measure");
-        ResultsTable resultsTable = ResultsTable.getResultsTable();
-        double[] areas = resultsTable.getColumn("Area");
+        int measurements = Measurements.AREA;
+        ResultsTable rt = new ResultsTable();
+        Analyzer analyzer = new Analyzer(maskImage, measurements, rt);
+        analyzer.measure();
+        double[] areas = rt.getColumn("Area");
         Arrays.sort(areas);
 
         // Calc mean

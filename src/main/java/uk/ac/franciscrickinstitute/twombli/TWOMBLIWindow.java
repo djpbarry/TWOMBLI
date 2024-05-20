@@ -137,7 +137,7 @@ public class TWOMBLIWindow extends StackWindow {
         // Maximum curvature
         JLabel maximumCurvatureWindowInfo = new JLabel("Maximum Anamorf Curvature Window:");
         this.maximumCurvatureWindowField = new JFormattedTextField(intFormat);
-        this.maximumCurvatureWindowField.setValue(40);
+        this.maximumCurvatureWindowField.setValue(20);
         JPanel maximumCurvatureWindowPanel = new JPanel();
         maximumCurvatureWindowPanel.setLayout(panelLayout);
         maximumCurvatureWindowPanel.setToolTipText("The minimum curvature window for Anamorf.");
@@ -183,11 +183,12 @@ public class TWOMBLIWindow extends StackWindow {
         // Gap analysis checkbox
         this.gapAnalysisCheckbox = new JCheckBox("Perform Gap Analysis");
         this.gapAnalysisCheckbox.setToolTipText("Check this box to perform gap analysis.");
+        this.gapAnalysisCheckbox.setSelected(true);
 
         // Gap analysis diameter
         JLabel gapAnalysisDiameterInfo = new JLabel("Minimum Gap Analysis Diameter:");
         this.gapAnalysisDiameterField = new JFormattedTextField(intFormat);
-        this.gapAnalysisDiameterField.setValue(0);
+        this.gapAnalysisDiameterField.setValue(50);
         JPanel gapAnalysisDiameterPanel = new JPanel();
         gapAnalysisDiameterPanel.setLayout(panelLayout);
         gapAnalysisDiameterPanel.setToolTipText("The minimum diameter for gap analysis. 0 finds only 1.");
