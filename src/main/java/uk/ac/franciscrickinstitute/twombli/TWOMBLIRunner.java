@@ -188,6 +188,7 @@ public class TWOMBLIRunner implements Command {
 
         // Invert LUTs
         IJ.run(output, "Invert LUT", "");
+        IJ.run(output, "Invert", "");
 
         // Handle outputs
         IJ.saveAs(output, "png", maskImage);
