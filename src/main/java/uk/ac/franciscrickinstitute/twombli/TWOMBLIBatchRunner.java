@@ -15,7 +15,7 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Plugins>TWOMBLI>Batch Runner")
+@Plugin(type = Command.class, headless = true)
 public class TWOMBLIBatchRunner implements Command {
 
     @Parameter

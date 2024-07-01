@@ -3,8 +3,11 @@ package uk.ac.franciscrickinstitute.twombli;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import ij.IJ;
@@ -26,7 +29,7 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Plugins>TWOMBLI>Runner")
+@Plugin(type = Command.class, headless = true)
 public class TWOMBLIRunner implements Command {
 
     @Parameter
@@ -132,27 +135,53 @@ public class TWOMBLIRunner implements Command {
 
         // Move all files from the mask image directory to the masks directory
         File maskImageDirectory = new File(maskImageDirectoryPath);
-        File[] files = maskImageDirectory.listFiles();
-        assert files != null;
+        File[] images = maskImageDirectory.listFiles((dir, name) -> name.endsWith(".png"));
+        File[] core_csv_folder = maskImageDirectory.listFiles((dir, name) -> name.endsWith("Output"));
+        File[] csvs = maskImageDirectory.listFiles((dir, name) -> name.matches(".*Output_.*"));
+        assert images != null;
+        assert core_csv_folder != null;
+        assert core_csv_folder.length == 1;
+        assert csvs != null;
         try {
-            for (File file : files) {
-                // Deals with the anamorf folder
-                if (file.isDirectory()) {
-                    File[] anamorfFiles = file.listFiles();
-                    assert anamorfFiles != null;
-                    for (File anamorfFile : anamorfFiles) {
-                        Files.move(Paths.get(anamorfFile.getAbsolutePath()), Paths.get(masksDirectory + File.separator + this.filePrefix + "_" + file.getName() + "_" + anamorfFile.getName()), StandardCopyOption.REPLACE_EXISTING);
-                    }
-                }
-
-                else {
-                    Files.move(Paths.get(file.getAbsolutePath()), Paths.get(masksDirectory + File.separator + file.getName()), StandardCopyOption.REPLACE_EXISTING);
-                }
+            // Copy pngs
+            for (File file : images) {
+                Files.move(Paths.get(file.getAbsolutePath()), Paths.get(masksDirectory + File.separator + file.getName()), StandardCopyOption.REPLACE_EXISTING);
             }
+
+            // Load our core data into memory
+            List<List<String>> data = new ArrayList<>();
+            BufferedReader reader = new BufferedReader(new FileReader(new File(core_csv_folder[0].getAbsolutePath(), "results.csv")));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                data.add(new ArrayList<>(Arrays.asList(line.split(","))));
+            }
+            reader.close();
+
+            // Append the rest of the csvs
+            for (File file : csvs) {
+                reader = new BufferedReader(new FileReader(new File(file.getAbsolutePath(), "results.csv")));
+                int counter = 0;
+                while ((line = reader.readLine()) != null) {
+                    List<String> columns = new ArrayList<>(Arrays.asList(line.split(",")));
+                    columns.remove(0);
+                    data.get(counter).addAll(columns);
+                    counter++;
+                }
+                reader.close();
+            }
+
+            // Write our data
+            File target_file = Paths.get(masksDirectory + File.separator + this.filePrefix + "_results.csv").toFile();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(target_file));
+            for (List<String> columns : data) {
+                writer.write(String.join(",", columns) + "\n");
+            }
+            writer.close();
 
             // Delete the contents of the source directory
             FileUtils.deleteDirectoryContents(maskImageDirectory);
             maskImageDirectory.delete();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

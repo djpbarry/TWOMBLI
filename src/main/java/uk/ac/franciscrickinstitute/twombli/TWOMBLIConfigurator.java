@@ -14,7 +14,7 @@ import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Plugins>TWOMBLI>Configurator")
+@Plugin(type = Command.class, headless = true, menuPath = "Plugins>TWOMBLI")
 public class TWOMBLIConfigurator implements Command {
 
     public static final ArrayList<String> EXTENSIONS = new ArrayList<>(Arrays.asList(
