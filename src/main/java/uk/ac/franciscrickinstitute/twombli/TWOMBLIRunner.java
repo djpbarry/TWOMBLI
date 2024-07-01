@@ -141,7 +141,7 @@ public class TWOMBLIRunner implements Command {
                     File[] anamorfFiles = file.listFiles();
                     assert anamorfFiles != null;
                     for (File anamorfFile : anamorfFiles) {
-                        Files.move(Paths.get(anamorfFile.getAbsolutePath()), Paths.get(masksDirectory + File.separator + this.filePrefix + "_" + anamorfFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+                        Files.move(Paths.get(anamorfFile.getAbsolutePath()), Paths.get(masksDirectory + File.separator + this.filePrefix + "_" + file.getName() + "_" + anamorfFile.getName()), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
 
