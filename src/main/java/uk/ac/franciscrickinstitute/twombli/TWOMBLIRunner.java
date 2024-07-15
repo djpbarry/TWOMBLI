@@ -216,7 +216,8 @@ public class TWOMBLIRunner implements Command {
         ImagePlus output = this.multiScaleRidgeDetection(ridgeDetectionBaseImage);
 
         // Invert LUTs
-        IJ.run(output, "Invert LUT", "");
+        IJ.run(output, "Grays", "");
+        IJ.run(output, "Invert", "");
 
         // Handle outputs
         IJ.saveAs(output, "png", maskImage);
