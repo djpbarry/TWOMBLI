@@ -138,6 +138,7 @@ public class TWOMBLIBatchRunner implements Command {
         // Loop through our results and generate a summary
         Path gapsOutputPath = Paths.get(this.outputPath, "gaps_summary.csv");
         Path twombliOutputPath = Paths.get(this.outputPath, "twombli_summary.csv");
+        boolean doHeader = true;
         for (TWOMBLIRunner runner : this.runners) {
             // Gather our basic info
             String filePrefix = runner.filePrefix;
@@ -149,14 +150,26 @@ public class TWOMBLIBatchRunner implements Command {
 
             // Write to our twombli summary
             try {
-                List<String> anamorfEntries = Files.readAllLines(anamorfSummaryPath);
-                String anamorfData = anamorfEntries.get(anamorfEntries.size() - 1);
-
-                List<String> hdmEntries = Files.readAllLines(hdmSummaryPath);
-                String[] hdmData = hdmEntries.get(hdmEntries.size() - 1).split(",");
-
                 List<String> lines = new ArrayList<>();
-                lines.add(anamorfData + "," + hdmData[hdmData.length - 1] + "," + alignment + "," + dimension);
+                List<String> anamorfEntries = Files.readAllLines(anamorfSummaryPath);
+                List<String> hdmEntries = Files.readAllLines(hdmSummaryPath);
+
+                // Conditionally write out our header
+                if (doHeader) {
+                    String headerItems = anamorfEntries.get(0);
+                    String[] hdmHeaderItems = hdmEntries.get(0).split(",");
+                    String header = headerItems + hdmHeaderItems[hdmHeaderItems.length - 1] + ",Alignment (Coherency [%]),Size";
+                    lines.add(header);
+                    doHeader = false;
+                }
+
+                // Get the data
+                String anamorfData = anamorfEntries.get(anamorfEntries.size() - 1);
+                String[] hdmData = hdmEntries.get(hdmEntries.size() - 1).split(",");
+                double hdmValue = 1 - Double.parseDouble(hdmData[hdmData.length - 1]);
+                lines.add(anamorfData + "," + hdmValue + "," + alignment + "," + dimension);
+
+                // Write
                 Files.write(twombliOutputPath, lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             }
 
