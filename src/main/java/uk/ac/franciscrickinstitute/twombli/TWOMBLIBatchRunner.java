@@ -158,7 +158,7 @@ public class TWOMBLIBatchRunner implements Command {
                 if (doHeader) {
                     String headerItems = anamorfEntries.get(0);
                     String[] hdmHeaderItems = hdmEntries.get(0).split(",");
-                    String header = headerItems + hdmHeaderItems[hdmHeaderItems.length - 1] + ",Alignment (Coherency [%]),Size";
+                    String header = headerItems + "," + hdmHeaderItems[hdmHeaderItems.length - 1] + ",Alignment (Coherency [%]),Size";
                     lines.add(header);
                     doHeader = false;
                 }
