@@ -159,7 +159,7 @@
         <dependency>
             <groupId>com.github.djpbarry</groupId>
             <artifactId>Anamorf</artifactId>
-            <version>4f6cb16cd8</version>
+            <version>d610176007</version>
             <exclusions>
                 <exclusion>
                     <groupId>sc.fiji</groupId>
