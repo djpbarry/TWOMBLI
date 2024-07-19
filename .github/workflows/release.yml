@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IJ_DOWNLOAD_URL: https://downloads.imagej.net/fiji/latest/fiji-linux64.zip
-      WIKI_USER: djpbarry
+      WIKI_USER: ${{ secrets.UPDATE_USER }}
       UPDATE_PASS: ${{ secrets.UPDATE_PASS }}  # DO NOT WRITE your password here
       UPDATE_SITE: TWOMBLI
     steps:
