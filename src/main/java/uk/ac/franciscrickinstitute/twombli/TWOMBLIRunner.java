@@ -1,15 +1,5 @@
 package uk.ac.franciscrickinstitute.twombli;
 
-import java.awt.*;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
@@ -18,16 +8,23 @@ import ij.io.FileInfo;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
 import ij.plugin.ImageCalculator;
-import ij.plugin.Macro_Runner;
 import ij.plugin.filter.Analyzer;
 import ij.plugin.frame.RoiManager;
-import loci.plugins.macro.LociFunctions;
 import net.calm.anamorf.Batch_Analyser;
 import net.calm.anamorf.params.DefaultParams;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import java.awt.*;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Plugin(type = Command.class, headless = true)
 public class TWOMBLIRunner implements Command {
@@ -77,13 +74,13 @@ public class TWOMBLIRunner implements Command {
     @Parameter
     public int minimumGapDiameter = 0;
 
-    @Parameter(type=ItemIO.OUTPUT)
+    @Parameter(type = ItemIO.OUTPUT)
     public ImagePlus output;
 
-    @Parameter(type=ItemIO.OUTPUT)
+    @Parameter(type = ItemIO.OUTPUT)
     public double alignment;
 
-    @Parameter(type=ItemIO.OUTPUT)
+    @Parameter(type = ItemIO.OUTPUT)
     public int dimension;
 
     // Magic number declarations
@@ -320,9 +317,7 @@ public class TWOMBLIRunner implements Command {
                 File propsFile = new File(this.anamorfPropertiesFile);
                 props.loadFromXML(Files.newInputStream(propsFile.toPath()));
             }
-        }
-
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             return;
         }
@@ -381,9 +376,7 @@ public class TWOMBLIRunner implements Command {
         IJ.saveAs(hdmBaseImage, "png", filaPath);
 
         // Find our HDM Macro and run it. Note, the macro has an undeclared dependency on bioformats
-        new LociFunctions();
-        IJ.runMacro("run(\"Bio-Formats Macro Extensions\")");
-        Macro_Runner.runMacroFromJar("Quant_Black_Space.ijm", filaPath);
+        quantifyHDM(filaPath);
         ResultsTable resultsTable = Analyzer.getResultsTable();
         try {
             resultsTable.saveAs(hdmResultsDirectory + File.separator + this.filePrefix + "_ResultsHDM.csv");
@@ -475,20 +468,18 @@ public class TWOMBLIRunner implements Command {
         File individualGapAnalysisFile = new File(individualGapAnalysisFilePath);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(individualGapAnalysisFile))) {
             bw.write(this.filePrefix + " " + mean + " " + standardDeviation + " " + fivePercentile + " " + fiftyPercentile + " " + ninetyFivePercentile);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Write the array to file
-        String individualGapAnalysisArrayFilePath = gapAnalysisDirectory + File.separator +  this.filePrefix + "_area_arrays.csv";
+        String individualGapAnalysisArrayFilePath = gapAnalysisDirectory + File.separator + this.filePrefix + "_area_arrays.csv";
         File individualGapAnalysisArrayFile = new File(individualGapAnalysisArrayFilePath);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(individualGapAnalysisArrayFile))) {
             for (double area : areas) {
                 bw.write(area + "\n");
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         WindowManager.setTempCurrentImage(null);
@@ -504,5 +495,21 @@ public class TWOMBLIRunner implements Command {
         for (Frame frame : frames) {
             frame.dispose();
         }
+    }
+
+    private void quantifyHDM(String input) {
+        ResultsTable resultsTable = Analyzer.getResultsTable();
+        ImagePlus hdmImp = IJ.openImage(input);
+        int imageSize = hdmImp.getWidth() * hdmImp.getHeight();
+        long minZero = imageSize;
+        long[] histogram = hdmImp.getProcessor().getStatistics().getHistogram();
+
+        if (histogram[0] < minZero) {
+            minZero = histogram[0];
+        }
+        hdmImp.close();
+        resultsTable.addValue("Image Name", input);
+        resultsTable.addValue("Series", 0);
+        resultsTable.addValue("% HDM", (float) minZero / imageSize);
     }
 }
