@@ -8,7 +8,7 @@ jobs:
   build_release:
     runs-on: ubuntu-latest
     env:
-      IJ_DOWNLOAD_URL: https://downloads.imagej.net/fiji/latest/fiji-latest-portable-nojava.zip
+      IJ_DOWNLOAD_URL: https://downloads.imagej.net/fiji/stable/fiji-stable-portable-nojava.zip
       WIKI_USER: ${{ secrets.UPDATE_USER }}
       UPDATE_PASS: ${{ secrets.UPDATE_PASS }}  # DO NOT WRITE your password here
       UPDATE_SITE: TWOMBLI
@@ -20,7 +20,7 @@ jobs:
       - name: Install ImageJ/Fiji
         run: |
           curl --silent -O ${IJ_DOWNLOAD_URL}
-          unzip fiji-latest-portable-nojava.zip
+          unzip fiji-stable-portable-nojava.zip
           ./Fiji.app/ImageJ-linux64 --headless --update update
           ./Fiji.app/ImageJ-linux64 --headless --update edit-update-site ${UPDATE_SITE} https://sites.imagej.net/${UPDATE_SITE}/ "webdav:${WIKI_USER}:${UPDATE_PASS}" .
       - name: Install in ImageJ/Fiji (with Maven)
